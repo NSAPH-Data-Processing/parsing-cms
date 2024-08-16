@@ -27,4 +27,4 @@ Note that this can take some time.
 
 ## Exploring `dorieh` functionality
 
-The root of the `dorieh` python package is not the root of the [`dorieh` GitHub repo](https://github.com/NSAPH-Data-Platform/dorieh/tree/main), but rather `dorieh/src/python/dorieh`. You can find all 
+The root of the `dorieh` python package is not the root of the [`dorieh` GitHub repo](https://github.com/NSAPH-Data-Platform/dorieh/tree/main), but rather `dorieh/src/python/dorieh`. There is good documentation and explanations for things on [PyPi](https://foromeplatform.github.io/dorieh/), but you can also look through the root of the [python package on GitHub](https://github.com/NSAPH-Data-Platform/dorieh/tree/main/src/python/dorieh) to get a better idea for how things are working under the hood.
