@@ -24,15 +24,7 @@ def change_dtypes(data, column_types,verbose = False):
     """Converts column data types based on provided type mapping using PyArrow."""
     for col, dtype in column_types.items():
         values = data[col]  # Extract column values
-        
-        if col == 'DOB': 
-            data[col] = pa.array(
-                [datetime.strptime(str(int(v)), "%Y%m%d") if v else None for v in values], 
-                type=pa.date64()
-            )
-            if verbose: print(f"{col}: Converted SAS numeric date to PyArrow date64")
-            
-        elif dtype == 'double':
+        if dtype == 'double':
             if verbose: print(f"{col}: double --> float")
             data[col] = pa.array(values, type=pa.float64())
         
