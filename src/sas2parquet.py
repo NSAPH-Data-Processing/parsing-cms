@@ -2,11 +2,12 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pyreadstat
 from itertools import islice
-from datetime import datetime
+from datetime import date, datetime
 import time
 import argparse
 import os
 import re
+import numpy
 
 def create_datapath(sas_file,out_path):
     """Creates a directory for storing processed files."""
@@ -20,17 +21,27 @@ def create_datapath(sas_file,out_path):
     
     return output_dir
 
-def change_dtypes(data, column_types,verbose = False):
+def change_dtypes(data, verbose = False):
     """Converts column data types based on provided type mapping using PyArrow."""
-    for col, dtype in column_types.items():
-        values = data[col]  # Extract column values
-        if dtype == 'double':
-            if verbose: print(f"{col}: double --> float")
-            data[col] = pa.array(values, type=pa.float64())
-        
-        else:  # Default to string (CHAR)
-            data[col] = pa.array(values, type=pa.string())
-            if verbose: print(f"{col}: CHAR")
+    for col, values in data.items():
+            sample_values = [v for v in values if v is not None][:10]  # Check first 10 non-null values
+            detected_types = set(type(v) for v in sample_values)
+
+            if verbose:
+                print(f"Column: {col} | Detected Types: {detected_types}")
+
+            if detected_types == {date} or detected_types == {datetime}:  
+                if verbose: print(f"{col}: Detected date, converting to PyArrow date64")
+                data[col] = pa.array(values, type=pa.date64())
+
+            elif detected_types <= {int, float,numpy.float64}:  
+                if verbose: print(f"{col}: Detected numeric, converting to PyArrow float64")
+                data[col] = pa.array([float(v) if isinstance(v, (int, float)) or (isinstance(v, str) and v.replace('.', '', 1).isdigit()) else None for v in values], type=pa.float64())
+
+            else:  # Default to string (CHAR)
+                if verbose: print(f"{col}: Detected as string")
+                # Apply v.strip() if v.strip() else None pattern for string columns
+                data[col] = pa.array([v.strip() if isinstance(v, str) and v.strip() else None for v in values], type=pa.string())
     return data
 
 def process_sas(sas_file, out_path, start_row = 0, num_rows = 10**6, verbose=False):
@@ -43,10 +54,10 @@ def process_sas(sas_file, out_path, start_row = 0, num_rows = 10**6, verbose=Fal
     data, meta = pyreadstat.read_sas7bdat(sas_file, row_offset=start_row, row_limit=num_rows, output_format='dict')  
     
     # headers = meta.column_names  # Get column names
-    column_types = meta.readstat_variable_types  # Get column types (for type casting)
+    # column_types = meta.readstat_variable_types  # Get column types (for type casting)
 
     # cast datatypes and store as pyarrow arrays
-    data = change_dtypes(data, column_types, verbose=verbose)
+    data = change_dtypes(data, verbose=verbose)
     # convert to pyarrow table
     table = pa.table(data)
     # write to parquet
