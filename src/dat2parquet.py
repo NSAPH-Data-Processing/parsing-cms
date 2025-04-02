@@ -74,16 +74,28 @@ def process_dat(dat_file, out_path, start_row=0, num_rows=10**6, verbose=False):
     """Processes a .dat file in chunks, extracts data using struct, and saves as Parquet."""
     start_time = time.time()
 
-    data_dict = read_fts(dat_file.replace('.dat','.fts'))
+    # processing file name for fts identification if file has multiple parts
+    base_name = re.sub(r'_\d{3}\.dat$', '', dat_file)  # Remove _001, _002, etc., from the .dat file name
+    fts_file = base_name.replace('.dat', '.fts')
+    data_dict = read_fts(fts_file)
     keys = list(data_dict.keys())
 
     if len(keys) < 6:  
         raise ValueError("FTS file does not contain expected metadata fields.")
 
     headers = data_dict[keys[2]]
-    column_widths = list(map(int, data_dict[keys[5]]))
+    column_widths_raw = data_dict[keys[5]]
+    start_columns = list(map(int, data_dict[keys[4]]))
     data_types = dict(zip(headers, data_dict[keys[3]]))
 
+    # calculate column width using col start from fts file if typo exists in field width column
+    column_widths = [
+        int(width) if width.isdigit() else (start_columns[i + 1] - start_columns[i])
+        for i, width in enumerate(column_widths_raw[:-1])
+    ]
+    # handle the last column width
+    column_widths.append(int(column_widths_raw[-1]) if column_widths_raw[-1].isdigit() else None)
+    
     # set format of widths for byte parsing
     format_string = ''.join([f'{width}s' for width in column_widths])
 
