@@ -1,0 +1,47 @@
+schema: "medicare"
+description: "Data model for Medicare, including beneficiary and enrollment tables."
+basepath: "/n/dominici_nsaph_l3/Lab/data/data_warehouse/dw_raw_medicare"  # Base directory for Parquet files
+tables:
+  mbsf_d:
+    name: "mbsf_d"
+    description: Data from mbsf_d* Parquet files used to create beneficiary and enrollment tables.
+    path_pattern: "{basepath}/{year}/mbsf_*d*/part-*.parquet"
+    columns:
+      - bene_id
+      - year:
+          rename_source: "RFRNC_YR"  
+      - dual_mo:
+          type: INT
+          cast:
+            '*': "{column_name}::INT"
+      # - dual_indicators:
+      #     type: CHAR(1)[12]
+      #     m: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+      #     source: ["DUAL_{m}"]
+      #     cast:
+      #       '*': "array_value({columns})"
+          # group_by:
+          #   - bene_id
+
+
+
+          # - file
+          # - record
+  ps:
+    name: "ps"
+    description: "Patient Summary view combining multiple MBSF files"
+    path_pattern: "{basepath}/{year}/mbsf_ab*/part-*.parquet"
+    columns:
+      - bene_id
+      - file
+      - record
+    #   - year:
+    #       source: '(CASE WHEN "year"::int < 20 THEN (2000 + "year"::int) WHEN (20 < "year"::int AND "year"::int < 100) THEN (1900 + "year"::int) WHEN "year" IS NULL THEN 2000 ELSE "year"::int END)'
+    #   - state:
+    #       source: '(SELECT state_id FROM public.us_states as s WHERE s.ssa2 = "state")'
+    #   - zip:
+    #       type: INT
+    #       cast:
+    #         numeric: "(CASE WHEN {column_name} < 100000 THEN {column_name}::int ELSE ({column_name}/10000)::INT END)"
+    #         "character varying": "SUBSTRING({column_name} FROM 1 FOR 5)::INT"
+    #         integer: "{column_name}::INT"
