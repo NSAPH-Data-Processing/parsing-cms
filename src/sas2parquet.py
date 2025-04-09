@@ -51,7 +51,7 @@ def process_sas(sas_file, out_path, start_row = 0, num_rows = 10**6, verbose=Fal
     start_time = time.time()
 
     # Read the .sas7bdat file as dictionary instead of default pandas df
-    data, meta = pyreadstat.read_sas7bdat(sas_file, row_offset=start_row, row_limit=num_rows, output_format='dict')  
+    data, meta = pyreadstat.read_sas7bdat(sas_file, row_offset=start_row, row_limit=num_rows,encoding='latin1', output_format='dict')  
     
     # headers = meta.column_names  # Get column names
     # column_types = meta.readstat_variable_types  # Get column types (for type casting)

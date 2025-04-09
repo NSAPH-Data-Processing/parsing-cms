@@ -59,14 +59,24 @@ def change_dtypes(data, type_dict, verbose=False):
     
     return data
 
-def create_datapath(dat_file,out_path):
+def create_datapath(dat_file, out_path):
     """Creates a directory for storing processed files."""
     file_name = os.path.basename(dat_file)
-    match = re.search(r'_(\d{4})(?:_\d+|\.|$)', file_name) # Extracts the year from the filename, handling different naming conventions
+    match = re.search(r'_(\d{4})(?:_\d+|\.|$)', file_name)
     year = match.group(1) if match else file_name
-    file_stem = file_name.rsplit("_", 1)[0]  
+    base = os.path.splitext(file_name)[0]
+
+    # Remove "_<year>" if it's the last part (i.e. not followed by _###)
+    chunk_match = re.search(r'_(\d{3})$', base)
+    if chunk_match:
+        file_stem = base  # keep full stem including _001
+    else:
+        file_stem = re.sub(r'_\d{4}$', '', base)  # remove trailing _YYYY
+
     output_dir = os.path.join(out_path, year, file_stem)
     os.makedirs(output_dir, exist_ok=True)
+    return output_dir
+
 
     return output_dir
 
@@ -74,10 +84,10 @@ def process_dat(dat_file, out_path, start_row=0, num_rows=10**6, verbose=False):
     """Processes a .dat file in chunks, extracts data using struct, and saves as Parquet."""
     start_time = time.time()
 
-    # processing file name for fts identification if file has multiple parts
-    base_name = re.sub(r'_\d{3}\.dat$', '', dat_file)  # Remove _001, _002, etc., from the .dat file name
-    fts_file = base_name.replace('.dat', '.fts')
+    # processing file name for fts identification if file even if it has multiple parts (_001, _002 etc)
+    fts_file = re.sub(r'(_\d{3})?\.dat$', '.fts', dat_file)
     data_dict = read_fts(fts_file)
+    print(fts_file)
     keys = list(data_dict.keys())
 
     if len(keys) < 6:  
