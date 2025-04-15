@@ -21,27 +21,38 @@ def create_datapath(sas_file,out_path):
     
     return output_dir
 
-def change_dtypes(data, verbose = False):
+def change_dtypes(data, verbose=False):
     """Converts column data types based on provided type mapping using PyArrow."""
     for col, values in data.items():
-            sample_values = [v for v in values if v is not None][:10]  # Check first 10 non-null values
-            detected_types = set(type(v) for v in sample_values)
+        # Filter out None and NaN values for type detection
+        sample_values = [v for v in values if v is not None and not (isinstance(v, float) and numpy.isnan(v))][:10]
+        detected_types = set(type(v) for v in sample_values)
 
+        if verbose:
+            print(f"Column: {col} | Detected Types: {detected_types}")
+
+        if detected_types <= {date, datetime}:
             if verbose:
-                print(f"Column: {col} | Detected Types: {detected_types}")
+                print(f"{col}: Detected date/datetime, converting to PyArrow date64")
+            # Replace NaN with None
+            cleaned_values = [v if isinstance(v, (date, datetime)) else None for v in values]
+            data[col] = pa.array(cleaned_values, type=pa.date64())
 
-            if detected_types == {date} or detected_types == {datetime}:  
-                if verbose: print(f"{col}: Detected date, converting to PyArrow date64")
-                data[col] = pa.array(values, type=pa.date64())
+        elif detected_types <= {int, float, numpy.float64}:
+            if verbose:
+                print(f"{col}: Detected numeric, converting to PyArrow float64")
+            data[col] = pa.array(
+                [float(v) if isinstance(v, (int, float)) and not (isinstance(v, float) and numpy.isnan(v)) else None for v in values],
+                type=pa.float64()
+            )
 
-            elif detected_types <= {int, float,numpy.float64}:  
-                if verbose: print(f"{col}: Detected numeric, converting to PyArrow float64")
-                data[col] = pa.array([float(v) if isinstance(v, (int, float)) or (isinstance(v, str) and v.replace('.', '', 1).isdigit()) else None for v in values], type=pa.float64())
-
-            else:  # Default to string (CHAR)
-                if verbose: print(f"{col}: Detected as string")
-                # Apply v.strip() if v.strip() else None pattern for string columns
-                data[col] = pa.array([v.strip() if isinstance(v, str) and v.strip() else None for v in values], type=pa.string())
+        else:
+            if verbose:
+                print(f"{col}: Detected as string")
+            data[col] = pa.array(
+                [v.strip() if isinstance(v, str) and v.strip() else None for v in values],
+                type=pa.string()
+            )
     return data
 
 def process_sas(sas_file, out_path, start_row = 0, num_rows = 10**6, verbose=False):
