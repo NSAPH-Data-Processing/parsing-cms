@@ -1,0 +1,53 @@
+# These are directory names under: data/<datapaths.name>/
+
+input_dir: input
+output_dir: output
+
+# Optional: restrict to specific years under input_dir
+# - omit years (or set to []) to auto-discover all YYYY folders
+years: [] 
+
+# Optional: restrict to specific stems (file basenames without year)
+# - omit stems (or set to []) to include all stems found
+stems: 
+  - mds_asmt 
+
+
+# Which file types to include (auto will include dat/sas/csv)
+file_type: "auto"        # auto|dat|csv|sas
+
+# Rows per chunk for DAT/SAS.
+# - If null or 0, DAT/SAS are parsed as ONE chunk.
+chunk_size: 10000000    # set to null to disable chunking
+
+# Output layout
+dir_structure: "year/file_stem"
+
+# QC
+run_qc: true
+verbose: true
+
+# SAS-only 
+sas_encoding: latin1
+#In our case, only needed for parsing sas files, or other files where source file is not directly under the {year} directory
+# input_globs:
+#   - "{year}/*/*.sas7bdat"
+
+
+# for nsaph lab 
+# for medicare_mbsf
+# - mbsf_ab_summary
+# - mbsf_abcd_summary
+# - mbsf_d_cmpnts
+# - den
+# - dn
+
+# for medicare_medpar file prefix 
+# - medpar
+# - mp
+
+#for mds_asmt 
+# - mds_asmt 
+
+#for mds_fac
+# - mds_fac

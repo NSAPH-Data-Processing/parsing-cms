@@ -1,0 +1,40 @@
+defaults:
+  - _self_
+  - datapaths: mds_asmt
+    #medicare_mbsf
+    #mds_asmt
+    #mds_fac
+    #medicare_medpar
+    #medicare_sas_red
+
+# conf/config.yaml
+parser_type: auto        # auto|dat|csv|sas
+
+#for medicare_mbsf_2022
+#input_file: null
+#output_path: null 
+
+# #for medicare_medpar
+# input_file: 
+#  - null
+#  - null
+# output_path: null 
+
+#for medicaid_taf_red
+#input_file: null
+#output_path: null 
+
+# Rows per chunk for DAT/SAS.
+start_row: 0
+chunk_size: 100
+dir_structure: "year/file_stem"
+verbose: false
+
+run_qc: false
+qc_output: "auto"
+
+# optional SAS specific
+sas_encoding: latin1
+
+
+
