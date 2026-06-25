@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parsecms"               
+version = "0.1.0"
+description = "Package to parse CMS data in sas, dat, zip, and csv into Parquet"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Shreya Nalluri" }
+]
+
+[project.urls]
+Homepage = ""
+
+[tool.setuptools]
+package-dir = {"" = "parsecms"}
+packages = ["parsecms"]
