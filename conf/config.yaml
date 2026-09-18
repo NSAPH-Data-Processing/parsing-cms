@@ -1,28 +1,29 @@
 defaults:
   - _self_
-  - datapaths: mds_asmt
+  - datapaths: medicare_ccw
     #medicare_mbsf
     #mds_asmt
     #mds_fac
     #medicare_medpar
     #medicare_sas_red
+    #medicare_ccw
 
 # conf/config.yaml
 parser_type: auto        # auto|dat|csv|sas
 
 #for medicare_mbsf_2022
-#input_file: null
-#output_path: null 
+#input_file: "${hydra:runtime.cwd}/data/medicare_mbsf/input/2022/mbsf_abcd_summary_res000017155_req014599_2022.dat"
+#output_path: "${hydra:runtime.cwd}/data/medicare_mbsf/output"  
 
 # #for medicare_medpar
 # input_file: 
-#  - null
-#  - null
-# output_path: null 
+#  - "${hydra:runtime.cwd}/data/medicare_medpar/input/2022/medpar_all_file_res000017155_req014599_2022_001.dat"
+#  - "${hydra:runtime.cwd}/data/medicare_medpar/input/2022/medpar_all_file_res000017155_req014599_2022_002.dat"
+# output_path: "${hydra:runtime.cwd}/data/medicare_medpar/output"  
 
 #for medicaid_taf_red
-#input_file: null
-#output_path: null 
+#input_file: "${hydra:runtime.cwd}/data/medicaid_taf_red/input/2016/taf_inpatient_occurrence_res000017155_req013731_2016.dat"
+#output_path: "${hydra:runtime.cwd}/data/medicaid_taf_red/output"  
 
 # Rows per chunk for DAT/SAS.
 start_row: 0
