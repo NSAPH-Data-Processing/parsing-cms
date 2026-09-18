@@ -84,9 +84,11 @@ def year_from_name(path: str) -> str:
       *_2016.dat
       *_2016_001.dat
       *_2016.csv
+      *_2006_1.sas7bdat
+      *2002.sas7bdat
     """
     name = os.path.basename(path)
-    m = re.search(r"_(\d{4})(?:_\d{3}|\.|$)", name)
+    m = re.search(r"_?(\d{4})(?:_\d+)?(?:\.|$)", name)
     return m.group(1) if m else "unknown"
 
 

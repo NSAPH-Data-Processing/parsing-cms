@@ -7,10 +7,16 @@ import pyreadstat
 
 from parsecms.fts import read_fts_table, extract_fixedwidth_schema_from_fts_table
 from parsecms.dat import fts_for_dat
+from parsecms.raw_qc import expected_shape_from_fts_text
 
 
 def _dat_row_count(dat_file: str) -> int:
     fts_file = fts_for_dat(dat_file)
+
+    expected = expected_shape_from_fts_text(fts_file)
+    if expected.get("rows") is not None:
+        return expected["rows"]
+
     fts_table = read_fts_table(fts_file)
     _, widths, _, _ = extract_fixedwidth_schema_from_fts_table(fts_table)
 

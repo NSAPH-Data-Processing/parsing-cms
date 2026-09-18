@@ -9,7 +9,8 @@ years: []
 
 # Optional: restrict to specific stems (file basenames without year)
 # - omit stems (or set to []) to include all stems found
-stems: []
+stems: 
+  - pde_file
 
 # Which file types to include (auto will include dat/sas/csv)
 file_type: "auto"        # auto|dat|csv|sas
